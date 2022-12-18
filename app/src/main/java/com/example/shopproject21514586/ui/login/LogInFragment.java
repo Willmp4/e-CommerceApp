@@ -1,35 +1,34 @@
 package com.example.shopproject21514586.ui.login;
 
-import static android.content.ContentValues.TAG;
-
 import static com.example.shopproject21514586.R.layout.fragment_login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.shopproject21514586.R;
 import com.example.shopproject21514586.UserActivities.MainActivity;
 
 import com.example.shopproject21514586.databinding.FragmentLoginBinding;
-import com.example.shopproject21514586.ui.logout.LogOutFragment;
-import com.example.shopproject21514586.ui.registration.RegistrationActivty;
 import com.example.shopproject21514586.ui.registration.RegistrationFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import io.paperdb.Paper;
 
 
 public class LogInFragment extends Fragment{
@@ -38,16 +37,22 @@ public class LogInFragment extends Fragment{
     Button logInButton;
     Button signUpButton;
     FirebaseAuth mAuth;
+    private CheckBox rememberMe;
     private FragmentLoginBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
+        //
 
         binding = FragmentLoginBinding.inflate(inflater, container, false);
+
         View view =  inflater.inflate(fragment_login, container, false);
         email_ = view.findViewById(R.id.inputUsername);
         password_ = view.findViewById(R.id.inputPassword);
+        rememberMe = view.findViewById(R.id.checkbox);
+        Paper.init(getContext());
+
+
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -56,26 +61,25 @@ public class LogInFragment extends Fragment{
         //On click listener for the sign in button
 
         logInButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 signIn();
             }
         });
+        //On click listener for the sign up button
         signUpButton = view.findViewById(R.id.signUpButton);
-
-        //On click listener for the sign in button
-
         signUpButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
-                //go to registration fragment
-                Intent intent = new Intent(getActivity(), RegistrationActivty.class);
-                startActivity(intent);
-
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                RegistrationFragment registrationFragment = new RegistrationFragment();
+                fragmentTransaction.replace(getId(), registrationFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
+
 //
 
         return view;
@@ -99,19 +103,25 @@ public class LogInFragment extends Fragment{
         }
     }
 
-//    //remember me check box
-//    private void rememberMe(){
-//        //remember me check box
-//        CheckBox rememberMe = findViewById(R.id.checkbox);
-//        if(rememberMe.isChecked()){
-//            //save username and password
-//
-//
-//        }
+    //remember me check box
+    private void rememberMe(FirebaseAuth mAuth) {
+        //remember me check box
+        if (rememberMe.isChecked()) {
+            //save username and password
+            Paper.book().write("email", mAuth.getCurrentUser().getEmail());
+            Paper.book().write("password", mAuth.getCurrentUser().getUid());
+            Paper.book().write("rememberMe", "true");
+
+        }
+        else {
+            Paper.book().write("rememberMe", "false");
+        }
+    }
 
     private void signIn() {
         String email = email_.getText().toString();
         String password = password_.getText().toString();
+
         //check if username and are empty
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(getActivity(), "Please enter email and password", Toast.LENGTH_SHORT).show();
@@ -124,6 +134,7 @@ public class LogInFragment extends Fragment{
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 FirebaseUser user = mAuth.getCurrentUser();
+                                rememberMe(mAuth);
                                 Toast.makeText(getActivity(), "Authentication Success!", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getActivity(), MainActivity.class);
                                 startActivity(intent);

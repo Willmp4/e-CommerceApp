@@ -1,7 +1,5 @@
 package com.example.shopproject21514586.UserActivities;
 
-import static com.example.shopproject21514586.R.layout.fragment_login;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,22 +10,23 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import com.example.shopproject21514586.R.layout.*;
+
 import com.example.shopproject21514586.R;
+import com.example.shopproject21514586.ui.registration.RegistrationFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.Objects;
-
 import com.example.shopproject21514586.databinding.ActivityMainNavigationBinding;
+
+import io.paperdb.Paper;
 
 public class    MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -49,6 +48,7 @@ public class    MainActivity extends AppCompatActivity {
         binding = ActivityMainNavigationBinding.inflate(getLayoutInflater());
 
         registerButton = findViewById(R.id.BtnRegister);
+        Paper.init(this);
 
 
 
@@ -64,12 +64,49 @@ public class    MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main_navigation);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-
-
-
-
-
     }
+
+    //Check if user is logged in
+    public void onStart() {
+        super.onStart();
+        //variables for reading the data from the Paper
+        String email = Paper.book().read("email");
+        String password = Paper.book().read("password");
+        String rememberMe = Paper.book().read("rememberMe");
+
+        if("true".equals(rememberMe) && email != null && password != null){
+            if(!email.isEmpty() && !password.isEmpty()){
+                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(MainActivity.this, "Already Logged in", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        //variables for reading the data from the Paper
+        //For  remember me
+        String rememberMe = Paper.book().read("rememberMe");
+
+
+
+        if("true".equals(rememberMe)){
+        }
+        else {
+            Paper.book().write("RememberMe", "false");
+            mAuth.signOut();
+        }
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
