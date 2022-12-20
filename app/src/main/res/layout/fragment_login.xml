@@ -109,9 +109,21 @@
         android:src="@drawable/ic_email"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintHorizontal_bias="0.917"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.688" />
+        app:layout_constraintVertical_bias="0.977" />
+
+    <Button
+        android:id="@+id/BtnAdmin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Admin?"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.791"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.976" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

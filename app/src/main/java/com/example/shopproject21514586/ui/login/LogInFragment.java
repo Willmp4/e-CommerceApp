@@ -49,6 +49,7 @@ public class LogInFragment extends Fragment{
     Button logInButton;
     Button signUpButton;
     FirebaseAuth mAuth;
+    Button adminButton;
     private CheckBox rememberMe;
     private FragmentLoginBinding binding;
 
@@ -56,28 +57,7 @@ public class LogInFragment extends Fragment{
                              ViewGroup container, Bundle savedInstanceState) {
         View view =  inflater.inflate(fragment_login, container, false);
 
-//        Glide.with(this)
-//                .load(R.drawable.ic_person)
-//                .listener(new RequestListener<Drawable>() {
-//                    @Override
-//                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-//                        return false;
-//                    }
-//                }).into((ImageView) view.findViewById(R.id.imageView2));
-
-
         binding = FragmentLoginBinding.inflate(inflater, container, false);
-
-
-
-
-
-
         email_ = view.findViewById(R.id.inputUsername);
         password_ = view.findViewById(R.id.inputPassword);
         rememberMe = view.findViewById(R.id.checkbox);
@@ -95,6 +75,16 @@ public class LogInFragment extends Fragment{
 
 
 
+        //On click listener for the Admin button
+        adminButton = view.findViewById(R.id.BtnAdmin);
+        adminButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Switch to the admin fragment
+                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main_navigation);
+                navController.navigate(R.id.nav_admin);
+            }
+        });
 
 
         //On click listener for the sign up button

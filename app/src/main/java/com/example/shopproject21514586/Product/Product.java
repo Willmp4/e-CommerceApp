@@ -1,7 +1,7 @@
 package com.example.shopproject21514586.Product;
 public class Product {
     private String name;
-    private double price;
+    private String price;
     private String description;
     private String imageUrl;
 
@@ -9,7 +9,7 @@ public class Product {
         // Default constructor required for calls to DataSnapshot.getValue(Product.class)
     }
 
-    public Product(String name, double price, String description, String imageUrl) {
+    public Product(String name, String price, String description, String imageUrl) {
         this.name = name;
         this.price = price;
         this.description = description;
@@ -20,7 +20,7 @@ public class Product {
         return name;
     }
 
-    public double getPrice() {
+    public String getPrice() {
         return price;
     }
 

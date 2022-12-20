@@ -36,12 +36,6 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        mDatabase = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/").getReference();
-
-
-        //Push a new product to the database
-        mDatabase.child("Products").child("Pro1").setValue(new Product("Ur Mum Gay", 1.0, "Test", "Test"));
-
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
 
@@ -50,12 +44,16 @@ public class HomeFragment extends Fragment {
 
         //On click listener for the sign up button
         Button cpuButton = view.findViewById(R.id.BtnCpu);
+
+
         cpuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 NavController navController = Navigation.findNavController(getActivity(),
                         R.id.nav_host_fragment_content_main_navigation);
                 navController.navigate(R.id.nav_cpus);
+                //Change title of the action bar to the name of the fragment
+                getActivity().setTitle("Cpus");
             }
         });
 

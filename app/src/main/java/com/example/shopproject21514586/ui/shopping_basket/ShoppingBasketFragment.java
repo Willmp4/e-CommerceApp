@@ -20,10 +20,8 @@ public class ShoppingBasketFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
         binding = FragmentShoppingBasketBinding.inflate(inflater, container, false);
         View view =  inflater.inflate(fragment_shopping_basket, container, false);
-
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
