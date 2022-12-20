@@ -33,13 +33,7 @@ public class MyAccountFragment extends Fragment {
         binding = FragmentMyAccountBinding.inflate(inflater, container, false);
         View view =  inflater.inflate(fragment_my_account, container, false);
 
-
-
         mAuth = FirebaseAuth.getInstance();
-
-
-
-
         email1 = view.findViewById(R.id.UserEmail_);
         verified = view.findViewById(R.id.UserVerified);
 

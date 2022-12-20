@@ -3,6 +3,7 @@ package com.example.shopproject21514586.ui.login;
 import static com.example.shopproject21514586.R.layout.fragment_login;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,13 +11,24 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
+
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.shopproject21514586.R;
 import com.example.shopproject21514586.UserActivities.MainActivity;
 
@@ -42,30 +54,49 @@ public class LogInFragment extends Fragment{
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        //
+        View view =  inflater.inflate(fragment_login, container, false);
+
+//        Glide.with(this)
+//                .load(R.drawable.ic_person)
+//                .listener(new RequestListener<Drawable>() {
+//                    @Override
+//                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+//                        return false;
+//                    }
+//                }).into((ImageView) view.findViewById(R.id.imageView2));
+
 
         binding = FragmentLoginBinding.inflate(inflater, container, false);
 
-        View view =  inflater.inflate(fragment_login, container, false);
+
+
+
+
+
         email_ = view.findViewById(R.id.inputUsername);
         password_ = view.findViewById(R.id.inputPassword);
         rememberMe = view.findViewById(R.id.checkbox);
         Paper.init(getContext());
-
-
-
         mAuth = FirebaseAuth.getInstance();
 
         logInButton = view.findViewById(R.id.logInButton);
-
         //On click listener for the sign in button
-
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signIn();
             }
         });
+
+
+
+
+
         //On click listener for the sign up button
         signUpButton = view.findViewById(R.id.signUpButton);
         signUpButton.setOnClickListener(new View.OnClickListener() {
@@ -76,11 +107,11 @@ public class LogInFragment extends Fragment{
                 RegistrationFragment registrationFragment = new RegistrationFragment();
                 fragmentTransaction.replace(getId(), registrationFragment);
                 fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.setReorderingAllowed(true);
+
                 fragmentTransaction.commit();
             }
         });
-
-//
 
         return view;
     }
@@ -98,20 +129,21 @@ public class LogInFragment extends Fragment{
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            startActivity(intent);
+            //Go to home fragment
+            NavController navController = Navigation.findNavController(getActivity(),
+                    R.id.nav_host_fragment_content_main_navigation);
+            navController.navigate(R.id.nav_home);
         }
     }
 
     //remember me check box
-    private void rememberMe(FirebaseAuth mAuth) {
+    private void rememberMe(String email, String password) {
         //remember me check box
         if (rememberMe.isChecked()) {
             //save username and password
-            Paper.book().write("email", mAuth.getCurrentUser().getEmail());
-            Paper.book().write("password", mAuth.getCurrentUser().getUid());
+           Paper.book().write("email", email);
+            Paper.book().write("password", password);
             Paper.book().write("rememberMe", "true");
-
         }
         else {
             Paper.book().write("rememberMe", "false");
@@ -134,8 +166,10 @@ public class LogInFragment extends Fragment{
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                rememberMe(mAuth);
+                                rememberMe(email, password);
+
                                 Toast.makeText(getActivity(), "Authentication Success!", Toast.LENGTH_SHORT).show();
+                                //Intent
                                 Intent intent = new Intent(getActivity(), MainActivity.class);
                                 startActivity(intent);
 
