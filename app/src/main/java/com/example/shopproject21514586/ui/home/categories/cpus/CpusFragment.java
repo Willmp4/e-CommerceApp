@@ -41,14 +41,12 @@ public class CpusFragment extends Fragment {
    public View onCreateView(@NonNull LayoutInflater inflater,
                             ViewGroup container, Bundle savedInstanceState) {
        View root = inflater.inflate(R.layout.fragment_cpus, container, false);
-
        RecyclerView recyclerView = root.findViewById(R.id.recycler_view);
+
 
        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
        recyclerView.setLayoutManager(layoutManager);
-
        FirebaseDatabase database = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/");
-
        DatabaseReference ref = database.getReference("Products").child("CPU");
        ref.addValueEventListener(new ValueEventListener() {
            @Override

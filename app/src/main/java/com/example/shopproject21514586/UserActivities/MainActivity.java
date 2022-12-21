@@ -69,7 +69,7 @@ public class  MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_my_account, R.id.nav_login, R.id.nav_logout, R.id.nav_home, R.id.nav_registration  )
+                R.id.nav_my_account, R.id.nav_login, R.id.nav_logout, R.id.nav_home, R.id.nav_registration, R.id.nav_shopping_basket )
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main_navigation);
@@ -79,8 +79,7 @@ public class  MainActivity extends AppCompatActivity {
         View headerView = navigationView.getHeaderView(0);
         //Set email to navigation header
         show_email = headerView.findViewById(R.id.show_email);
-        if(mAuth.getCurrentUser() !=null) {
-
+        if(mAuth.getCurrentUser() !=null){
             show_email.setText(mAuth.getCurrentUser().getEmail());
         }
 
@@ -105,6 +104,10 @@ public class  MainActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
+                        //Make log in button invisible
+                        binding.navView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                        //Make register button visible
+                        binding.navView.getMenu().findItem(R.id.nav_registration).setVisible(false);
                         show_email.setText(mAuth.getCurrentUser().getEmail());
                         Toast.makeText(MainActivity.this, "Already Logged in", Toast.LENGTH_SHORT).show();
                         }

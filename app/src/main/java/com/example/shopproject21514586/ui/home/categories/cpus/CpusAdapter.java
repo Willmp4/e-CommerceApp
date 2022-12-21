@@ -63,7 +63,7 @@ public class CpusAdapter extends RecyclerView.Adapter<CpusAdapter.CpuViewHolder>
             // Bind the data to the views in the ViewHolder
             productName.setText(product.getName());
             productDescription.setText(product.getDescription());
-            productPrice.setText("Price" + product.getPrice());
+            productPrice.setText("Price: " + product.getPrice());
             Glide.with(itemView.getContext()).load(product.getImageUrl()).into(productImage);
 //            productPrice.setText((int) product.getPrice());
             // Load the product image using Glide or any other image loading library

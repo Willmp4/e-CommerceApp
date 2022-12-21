@@ -25,6 +25,11 @@
             android:icon="@drawable/ic_logout"
             android:title="@string/registration" />
 
+        <item
+            android:id="@+id/nav_shopping_basket"
+            android:icon="@drawable/ic_basket"
+            android:title="Basket" />
+
 
     </group>
 </menu>
