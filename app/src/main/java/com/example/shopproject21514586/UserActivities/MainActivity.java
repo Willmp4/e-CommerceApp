@@ -60,9 +60,6 @@ public class  MainActivity extends AppCompatActivity {
         //Link to database
         Paper.init(this);
 
-
-
-
         setContentView(binding.getRoot());
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;

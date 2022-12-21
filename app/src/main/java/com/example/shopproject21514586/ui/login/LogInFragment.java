@@ -73,8 +73,6 @@ public class LogInFragment extends Fragment{
             }
         });
 
-
-
         //On click listener for the Admin button
         adminButton = view.findViewById(R.id.BtnAdmin);
         adminButton.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +83,6 @@ public class LogInFragment extends Fragment{
                 navController.navigate(R.id.nav_admin);
             }
         });
-
 
         //On click listener for the sign up button
         signUpButton = view.findViewById(R.id.signUpButton);
@@ -98,11 +95,9 @@ public class LogInFragment extends Fragment{
                 fragmentTransaction.replace(getId(), registrationFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.setReorderingAllowed(true);
-
                 fragmentTransaction.commit();
             }
         });
-
         return view;
     }
 

@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.shopproject21514586.Product.Product;
 import com.example.shopproject21514586.R;
+import com.example.shopproject21514586.UserActivities.MainActivity;
 import com.example.shopproject21514586.databinding.FragmentAdminBinding;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -77,7 +78,7 @@ public class AdminFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     categories.add(snapshot.getKey());
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, categories);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, categories);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 category.setAdapter(adapter);
             }
@@ -109,7 +110,7 @@ public class AdminFragment extends Fragment {
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addNewCategory("CPU", "Products", ref);
+                addNewCategory("GPU", "Products", ref);
             }
         });
         openGallery();
@@ -121,8 +122,10 @@ public class AdminFragment extends Fragment {
             public void onClick(View v) {
                 //Add the product to the database with url to the image
                 //Download url
-                addNewProduct(ref, name.getText().toString(), price.getText().toString(), description.getText().toString(), IMGURL, category.getSelectedItem().toString());
-
+                addNewProduct(ref, name.getText().toString(), description.getText().toString(), price.getText().toString(), IMGURL, category.getSelectedItem().toString());
+                //Start main activity
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
             }
         });
 
