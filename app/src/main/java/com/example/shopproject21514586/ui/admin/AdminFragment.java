@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -23,8 +23,7 @@ import com.example.shopproject21514586.R;
 import com.example.shopproject21514586.UserActivities.MainActivity;
 import com.example.shopproject21514586.databinding.FragmentAdminBinding;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.shopproject21514586.ui.category.Category;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,7 +35,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
+
+import io.paperdb.Paper;
 
 public class AdminFragment extends Fragment {
 
@@ -46,13 +46,15 @@ public class AdminFragment extends Fragment {
     EditText name;
     EditText price;
     EditText description;
-    EditText image;
+    Button addImage;
     Spinner category;
+    EditText newCategory;
     Button addProduct;
     EditText brand;
     Button addCategory;
     String IMGURL;
     DatabaseReference ref;
+    CheckBox checkBox;
     FirebaseDatabase database;
 
 
@@ -64,9 +66,10 @@ public class AdminFragment extends Fragment {
         price = view.findViewById(R.id.productPrice);
         description = view.findViewById(R.id.description);
         category = view.findViewById(R.id.category);
-        image = view.findViewById(R.id.addImg);
+        addImage = view.findViewById(R.id.addImg);
         addProduct = view.findViewById(R.id.BtnAddProduct);
         brand = view.findViewById(R.id.brand);
+        checkBox = view.findViewById(R.id.newCategoryCheckBox);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/");
         ref = database.getReference("Products");
@@ -103,18 +106,26 @@ public class AdminFragment extends Fragment {
                 category.setSelection(0);
             }
         });
-
         //Add category
         //On click listener for the button
+        newCategory = view.findViewById(R.id.newCategory);
         addCategory = view.findViewById(R.id.btnCategory);
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                addNewCategory("GPU", "Products", ref);
+            public void onClick(View view) {newCategory(newCategory.getText().toString(), ref);
+                //Start new activity
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
             }
         });
-        openGallery();
 
+        //Add image
+        addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+              openGallery();
+            }
+        });
 
         //On click listener for the add product button
         addProduct.setOnClickListener(new View.OnClickListener() {
@@ -132,9 +143,21 @@ public class AdminFragment extends Fragment {
         return view;
 
     }
+    //Function to clear the field's
+    public void clearFields(){
+        name.setText("");
+        price.setText("");
+        description.setText("");
+        brand.setText("");
+        newCategory.setText("");
+    }
 
-    public  void addNewCategory(String newCategory, String category, DatabaseReference ref){
-        ref.child(newCategory).setValue("");
+    //Check if checkbox is checked
+    private void newCategory(String newCategory, DatabaseReference ref) {
+        //remember me check box
+        if (checkBox.isChecked()) {
+            ref.child(newCategory).setValue("");
+        }
     }
 
     public void addNewProduct(DatabaseReference d, String name, String description, String price, String image, String category) {

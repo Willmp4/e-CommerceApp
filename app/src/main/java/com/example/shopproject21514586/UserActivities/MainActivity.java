@@ -4,9 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -19,23 +16,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.shopproject21514586.Product.Product;
 import com.example.shopproject21514586.R;
-import com.example.shopproject21514586.ui.home.HomeFragment;
-import com.example.shopproject21514586.ui.home.categories.cpus.CpusFragment;
-import com.example.shopproject21514586.ui.registration.RegistrationFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.api.Http;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
 import com.example.shopproject21514586.databinding.ActivityMainNavigationBinding;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import io.paperdb.Paper;
 
 public class  MainActivity extends AppCompatActivity {
@@ -74,17 +62,13 @@ public class  MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         View headerView = navigationView.getHeaderView(0);
+
+
         //Set email to navigation header
         show_email = headerView.findViewById(R.id.show_email);
         if(mAuth.getCurrentUser() !=null){
             show_email.setText(mAuth.getCurrentUser().getEmail());
         }
-
-
-//        TextView show_email = binding.navView.findViewById(R.id.nav_header_main_navigation).findViewById(R.id.show_email);
-//        show_email.setText(mAuth.getCurrentUser().getEmail());
-
-
 
     }
 
@@ -106,7 +90,6 @@ public class  MainActivity extends AppCompatActivity {
                         //Make register button visible
                         binding.navView.getMenu().findItem(R.id.nav_registration).setVisible(false);
                         show_email.setText(mAuth.getCurrentUser().getEmail());
-                        Toast.makeText(MainActivity.this, "Already Logged in", Toast.LENGTH_SHORT).show();
                         }
                     else{
                         Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();

@@ -55,6 +55,28 @@
         android:name="com.example.shopproject21514586.ui.home.categories.GPU.GpusFragment"
         android:label="Gpu"
         tools:layout="@layout/fragment_gpus" />
+    <fragment
+        android:id="@+id/nav_category"
+        android:name="com.example.shopproject21514586.ui.category.CategoryFragment"
+        android:label="Category"
+        tools:layout="@layout/fragment_category">
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+    </fragment>
+
+
+    <action
+        android:id="@+id/action_navigate_to_category"
+        app:destination="@id/nav_category">
+        <argument
+            android:name="categoryName"
+            app:argType="string"
+            app:nullable="false" />
+    </action>
+
+
+
 
 
 </navigation>

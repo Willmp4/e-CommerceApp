@@ -1,4 +1,4 @@
-package com.example.shopproject21514586.UserActivities;
+package com.example.shopproject21514586.ui.category;
 
 public class Category {
     private String name;
