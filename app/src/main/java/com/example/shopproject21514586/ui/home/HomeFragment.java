@@ -1,17 +1,23 @@
 package com.example.shopproject21514586.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.shopproject21514586.Product.Product;
+import com.example.shopproject21514586.Product.ProductsAdapter;
 import com.example.shopproject21514586.R;
 import com.example.shopproject21514586.ui.category.Category;
 import com.example.shopproject21514586.ui.category.CategoryAdapter;
@@ -21,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -31,62 +38,154 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
-    CategoryAdapter adapter;
+    private CategoryAdapter categoryAdapter;
+    private RecyclerView productsRecycler;
+    private List<Product> productList;
+    private List<Category> categoryList;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        List<Category> categories = new ArrayList<>();
+
+        categoryList = new ArrayList<>();
+        productList = new ArrayList<>();
         LinearSnapHelper snapHelper = new LinearSnapHelper();
 
-
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/");
         mDatabase = database.getReference("Products");
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        productsRecycler = view.findViewById(R.id.product_recycler);
+        productsRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+
+        // Set up the query to search for products with a name that contains the search text
+
+        // Set up the query to search for products with a name that contains the search text
+        SearchView searchView = view.findViewById(R.id.productSearch);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Query query = mDatabase.child("items").orderByChild("name").startAt(newText).endAt(newText + "\uf8ff");
+                query.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.d("TAG", "CHANGE: " + dataSnapshot.getKey());
+                        productList.clear();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Log.d("TAG", "onDataChange: " + snapshot.getKey());
+                            Product product = snapshot.getValue(Product.class);
+
+                            if (product.getName().contains(newText)) {
+                                productList.add(product);
+                            }
+
+                        }
+                        // Pass the data to the CpusAdapter and set the adapter for the RecyclerView
+                        ProductsAdapter adapter = new ProductsAdapter(productList);
+                        productsRecycler.setAdapter(adapter);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("HomeFragment", "onCancelled", error.toException());
+                    }
+                });
+                return false;
+            }
+        });
+
+//TODO:
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+//        productsRecycler.setLayoutManager(layoutManager);
+//        Query query = mDatabase.child("CPU");
+//        query.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                // Clear the list of products
+//                // Iterate through the search results and add them to the list
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    Product product = snapshot.getValue(Product.class);
+//                    productList.add(product);
+//                }
+//                // Update the UI to display the search results
+//                ProductsAdapter adapter = new ProductsAdapter(productList);
+//                productsRecycler.setAdapter(adapter);
+//            }
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                // An error occurred, log the error message
+//                Log.e("HomeFragment", databaseError.getMessage());
+//            }
+//        });
+
         // Get a reference to the recycler view
         RecyclerView recyclerView = view.findViewById(R.id.category_recycler);
-
         // Set the layout manager for the recycler view
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-
-        recyclerView.setLayoutManager(layoutManager);
-
-        // Create a list of categories
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        LinearLayoutManager layoutManager1 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(layoutManager1);
+        // Create a list of categoryList
+        mDatabase.child("Category").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String name = snapshot.getKey();
-                    categories.add(new Category(name, "", ""));
+
+                    categoryList.add(new Category(name, "", ""));
                 }
-                adapter = new CategoryAdapter(categories);
-                adapter.setOnItemClickListener(category -> {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("categoryName", category.getName());
-                    Navigation.findNavController(view).navigate(R.id.action_navigate_to_category, bundle);
+                categoryAdapter = new CategoryAdapter(categoryList);
+                categoryAdapter.setOnItemClickListener(category -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("categoryName", category.getName());
+                Navigation.findNavController(view).navigate(R.id.action_navigate_to_category, bundle);
                 });
 
-
+                // Set the adapter for the recycler view
                 snapHelper.attachToRecyclerView(recyclerView);
-                recyclerView.setAdapter(adapter);
+                recyclerView.setAdapter(categoryAdapter);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
 
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(getContext(), R.layout.fragment_home);
+
+
         return view;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        binding = null;
+//    }
+//
+//    public void onStart() {
+//        super.onStart();
+//
+//    }
+
+    private void searchProducts(String searchText, Query query  ) {
+        // Get a reference to the "Category" node in the "Products" node
+        // Attach a listener to the query to receive the search results
+
+
     }
 
-    public void onStart(){
-        super.onStart();
-
-    }
+//
+//    private void updateUI() {
+//
+//            // Display the search results
+////            Toast.makeText(getContext(), "", Toast.LENGTH_SHORT).show();
+//        LinearLayoutManager layoutManager1 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+//        productsRecycler.setLayoutManager(layoutManager1);
+//        ProductsAdapter adapter = new ProductsAdapter(productList);
+//        productsRecycler.setAdapter(adapter);
+//
+//    }
 }

@@ -1,6 +1,9 @@
 package com.example.shopproject21514586.ui.admin;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,7 +26,6 @@ import com.example.shopproject21514586.R;
 import com.example.shopproject21514586.UserActivities.MainActivity;
 import com.example.shopproject21514586.databinding.FragmentAdminBinding;
 
-import com.example.shopproject21514586.ui.category.Category;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,10 +35,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.paperdb.Paper;
 
 public class AdminFragment extends Fragment {
 
@@ -55,7 +57,6 @@ public class AdminFragment extends Fragment {
     String IMGURL;
     DatabaseReference ref;
     CheckBox checkBox;
-    FirebaseDatabase database;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -71,11 +72,14 @@ public class AdminFragment extends Fragment {
         brand = view.findViewById(R.id.brand);
         checkBox = view.findViewById(R.id.newCategoryCheckBox);
 
+        // Check the file extension
+        // If the code execution reaches here, it means the user's input file is a valid JPG image
+        // You can now use the image as needed in your app
+
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/");
         ref = database.getReference("Products");
         List<String> categories = new ArrayList<>();
-
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.child("Category").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -85,12 +89,14 @@ public class AdminFragment extends Fragment {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 category.setAdapter(adapter);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
 
         });
+
         // Set an OnItemSelectedListener for the spinner
         category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -106,26 +112,30 @@ public class AdminFragment extends Fragment {
                 category.setSelection(0);
             }
         });
+
         //Add category
         //On click listener for the button
         newCategory = view.findViewById(R.id.newCategory);
         addCategory = view.findViewById(R.id.btnCategory);
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {newCategory(newCategory.getText().toString(), ref);
+            public void onClick(View view) {
+                newCategory(newCategory.getText().toString(), ref);
                 //Start new activity
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 startActivity(intent);
             }
         });
 
-        //Add image
+        //Add image.jpg
         addImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              openGallery();
+                openGallery();
+
             }
         });
+
 
         //On click listener for the add product button
         addProduct.setOnClickListener(new View.OnClickListener() {
@@ -139,10 +149,30 @@ public class AdminFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
         return view;
-
     }
+
+    //Check if the file is an image.jpg
+    public boolean isValidJPG(String file) {
+        // Check the file extension#
+        File fileExtension = new File(file);
+        String fileName = fileExtension.getName();
+        fileName = fileName.substring(fileName.lastIndexOf("."));
+        if (!fileName.equalsIgnoreCase(".jpg") && !fileName.equalsIgnoreCase(".jpeg")) {
+            // Display an error message to the user and ask them to enter a valid JPG file
+            return false;
+        }
+
+        // Try to decode the file and check if it is a valid JPG image
+        try {
+            Bitmap bitmap = BitmapFactory.decodeFile(fileExtension.getAbsolutePath());
+            return true;
+        } catch (Exception e) {
+            // Display an error message to the user and ask them to enter a valid JPG file
+            return false;
+        }
+    }
+
     //Function to clear the field's
     public void clearFields(){
         name.setText("");
@@ -156,29 +186,24 @@ public class AdminFragment extends Fragment {
     private void newCategory(String newCategory, DatabaseReference ref) {
         //remember me check box
         if (checkBox.isChecked()) {
-            ref.child(newCategory).setValue("");
+        ref.child("Category").child(newCategory).setValue("");
         }
     }
 
-    public void addNewProduct(DatabaseReference d, String name, String description, String price, String image, String category) {
+    //Add new product to the database
+    public void addNewProduct(DatabaseReference ref, String name, String description, String price, String image, String category) {
         //Push a new product to the database
-        d.child(category).child(name).setValue(new Product(name, price, description, image));
+        ref.child("items").child(name).setValue(new Product(name, price, description, image, category));
     }
 
     //Open up gallery
     public void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, 1000);
-        //Check if the user has selected an image
-        if (gallery != null) {
-            Toast.makeText(getContext(), "Image selected", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getContext(), "Please select an image", Toast.LENGTH_SHORT).show();
-
-        }
-
     }
 
+
+    //Get the image from the gallery
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -188,15 +213,32 @@ public class AdminFragment extends Fragment {
             // Get the image URI
             Uri imageUri = data.getData();
 
-            // Save to firebase
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageRef = storage.getReference();
-            StorageReference imagesRef = storageRef.child("images");
-            StorageReference imageRef = imagesRef.child(imageUri.getLastPathSegment());
-            imageRef.putFile(imageUri);
-            //Call image from database
-            IMGURL = imageUri.toString();
+            String[] projection = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContext().getContentResolver().query(imageUri, projection, null, null, null);
 
+            if (cursor != null) {
+                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                cursor.moveToFirst();
+                String filePath = cursor.getString(columnIndex);
+
+                if (isValidJPG(filePath)) {
+                    // The user's input file is a valid JPG image
+                    // You can now use the image as needed in your app
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageRef = storage.getReference();
+                    StorageReference imagesRef = storageRef.child("images");
+                    StorageReference imageRef = imagesRef.child(imageUri.getLastPathSegment());
+                    imageRef.putFile(imageUri);
+                    IMGURL = imageUri.toString();
+                    Toast.makeText(getContext(), "Image selected", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    // The user's input file is not a valid JPG image
+                    Toast.makeText(getContext(), "Please select a valid image", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
+
+
 }

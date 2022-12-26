@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
+
     app:startDestination="@+id/nav_home">
 
     <fragment
@@ -10,11 +11,6 @@
         android:name="com.example.shopproject21514586.ui.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home" />
-    <fragment
-        android:id="@+id/nav_cpus"
-        android:name="com.example.shopproject21514586.ui.home.categories.cpus.CpusFragment"
-        android:label="CPUs"
-        tools:layout="@layout/fragment_cpus" />
 
     <fragment
         android:id="@+id/nav_my_account"
@@ -51,15 +47,13 @@
         tools:layout="@layout/fragment_admin" />
 
     <fragment
-        android:id="@+id/nav_gpu"
-        android:name="com.example.shopproject21514586.ui.home.categories.GPU.GpusFragment"
-        android:label="Gpu"
-        tools:layout="@layout/fragment_gpus" />
-    <fragment
         android:id="@+id/nav_category"
         android:name="com.example.shopproject21514586.ui.category.CategoryFragment"
-        android:label="Category"
         tools:layout="@layout/fragment_category">
+
+        <argument
+            android:name="category"
+            app:argType="string" />
         <argument
             android:name="categoryName"
             app:argType="string" />
@@ -74,9 +68,5 @@
             app:argType="string"
             app:nullable="false" />
     </action>
-
-
-
-
 
 </navigation>

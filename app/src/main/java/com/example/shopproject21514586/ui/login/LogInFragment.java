@@ -48,7 +48,7 @@ public class LogInFragment extends Fragment{
         View view =  inflater.inflate(fragment_login, container, false);
 
         binding = FragmentLoginBinding.inflate(inflater, container, false);
-        email_ = view.findViewById(R.id.inputUsername);
+        email_ = view.findViewById(R.id.email_input);
         password_ = view.findViewById(R.id.inputPassword);
         rememberMe = view.findViewById(R.id.checkbox);
         Paper.init(getContext());
@@ -120,9 +120,6 @@ public class LogInFragment extends Fragment{
             Paper.book().write("password", password);
             Paper.book().write("rememberMe", "true");
         }
-        else {
-            Paper.book().write("rememberMe", "false");
-        }
     }
 
     private void signIn() {
@@ -140,7 +137,6 @@ public class LogInFragment extends Fragment{
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
-                                FirebaseUser user = mAuth.getCurrentUser();
                                 rememberMe(email, password);
 
                                 Toast.makeText(getActivity(), "Authentication Success!", Toast.LENGTH_SHORT).show();
