@@ -5,6 +5,7 @@ import static com.example.shopproject21514586.R.layout.fragment_login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -29,6 +30,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import io.paperdb.Paper;
 
@@ -40,6 +46,7 @@ public class LogInFragment extends Fragment{
     Button signUpButton;
     FirebaseAuth mAuth;
     Button adminButton;
+    Button resetPassword;
     private CheckBox rememberMe;
     private FragmentLoginBinding binding;
 
@@ -51,6 +58,8 @@ public class LogInFragment extends Fragment{
         email_ = view.findViewById(R.id.email_input);
         password_ = view.findViewById(R.id.inputPassword);
         rememberMe = view.findViewById(R.id.checkbox);
+        resetPassword = view.findViewById(R.id.reset_password);
+
         Paper.init(getContext());
         mAuth = FirebaseAuth.getInstance();
 
@@ -69,8 +78,7 @@ public class LogInFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 //Switch to the admin fragment
-                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main_navigation);
-                navController.navigate(R.id.nav_admin);
+                adminLogin();
             }
         });
 
@@ -79,15 +87,15 @@ public class LogInFragment extends Fragment{
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                RegistrationFragment registrationFragment = new RegistrationFragment();
-                fragmentTransaction.replace(getId(), registrationFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.setReorderingAllowed(true);
-                fragmentTransaction.commit();
+                //Switch to the sign up fragment
+                NavController navController = Navigation.findNavController(getActivity(),
+                        R.id.nav_host_fragment_content_main_navigation);
+                navController.navigate(R.id.nav_registration);
+
             }
         });
+
+        resetPassword();
         return view;
     }
 
@@ -121,6 +129,32 @@ public class LogInFragment extends Fragment{
             Paper.book().write("rememberMe", "true");
         }
     }
+    //Reset password with on click listener
+    private void resetPassword() {
+        resetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //send email to reset password
+                String email = email_.getText().toString();
+                if (email.isEmpty()) {
+                    email_.setError("Please enter your email");
+                    email_.requestFocus();
+                } else {
+                    mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getContext(), "Email sent to reset password", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(getContext(), "Error! Email not sent", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
 
     private void signIn() {
         String email = email_.getText().toString();
@@ -155,23 +189,59 @@ public class LogInFragment extends Fragment{
 
     }
 
-//    private void reload() {
-//        FirebaseUser user = mAuth.getCurrentUser();
-//        if (user != null) {
-//            // User is signed in
-//            Log.d("TAG", "reload:signed_in");
-//        } else {
-//            // User is signed out
-//            Log.d("TAG", "reload:signed_out");
-//        }
-//    }
+    //Function for admin login
+    private void adminLogin() {
 
-//    public void onClick(View v) {
-//        if (v.getId() != view.findViewById(logInButton)) {
-//            return;
-//        }
-//        signIn();
-//
-//
-//    }
+        //Get firebase real time reference
+        DatabaseReference reference = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/").getReference("Admin");
+
+        String email = email_.getText().toString();
+        String password = password_.getText().toString();
+
+        //check if username and are empty
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(getActivity(), "Please enter email and password", Toast.LENGTH_SHORT).show();
+        } else {
+            //Sign in with email and password firebase method
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                //Write in book that sign in is successful
+                                Paper.book().write("signedIn", "true");
+                                rememberMe(email, password);
+                                Toast.makeText(getActivity(), "Authentication Success!", Toast.LENGTH_SHORT).show();
+                                //Check if the user is an admin
+                                reference.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.child(mAuth.getCurrentUser().getUid()).exists()) {
+                                            Paper.book().write("admin", "true");
+
+                                            //Go to admin fragment
+                                            NavController navController = Navigation.findNavController(getActivity(),
+                                                    R.id.nav_host_fragment_content_main_navigation);
+                                            navController.navigate(R.id.nav_admin);
+                                        } else {
+                                            Toast.makeText(getActivity(), "You are not an admin", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Toast.makeText(getActivity(), "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+    }
 }

@@ -30,7 +30,10 @@
             android:id="@+id/nav_shopping_basket"
             android:icon="@drawable/ic_basket"
             android:title="Basket" />
-
-
+        <item
+            android:id="@+id/nav_admin"
+            android:icon="@drawable/ic_person"
+            android:title="Admin"
+            android:visible="false"/>
     </group>
 </menu>

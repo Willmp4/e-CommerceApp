@@ -57,6 +57,7 @@ public class AdminFragment extends Fragment {
     String IMGURL;
     DatabaseReference ref;
     CheckBox checkBox;
+    EditText quantity;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -71,6 +72,8 @@ public class AdminFragment extends Fragment {
         addProduct = view.findViewById(R.id.BtnAddProduct);
         brand = view.findViewById(R.id.brand);
         checkBox = view.findViewById(R.id.newCategoryCheckBox);
+        quantity = view.findViewById(R.id.quantity);
+
 
         // Check the file extension
         // If the code execution reaches here, it means the user's input file is a valid JPG image
@@ -85,7 +88,7 @@ public class AdminFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     categories.add(snapshot.getKey());
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, categories);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, categories);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 category.setAdapter(adapter);
             }
@@ -143,7 +146,7 @@ public class AdminFragment extends Fragment {
             public void onClick(View v) {
                 //Add the product to the database with url to the image
                 //Download url
-                addNewProduct(ref, name.getText().toString(), description.getText().toString(), price.getText().toString(), IMGURL, category.getSelectedItem().toString());
+                addNewProduct(ref, name.getText().toString(), description.getText().toString(), price.getText().toString(), IMGURL, category.getSelectedItem().toString(), brand.getText().toString(), quantity.getText().toString());
                 //Start main activity
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 startActivity(intent);
@@ -191,9 +194,9 @@ public class AdminFragment extends Fragment {
     }
 
     //Add new product to the database
-    public void addNewProduct(DatabaseReference ref, String name, String description, String price, String image, String category) {
+    public void addNewProduct(DatabaseReference ref, String name, String description, String price, String image, String category, String brand, String quantity) {
         //Push a new product to the database
-        ref.child("items").child(name).setValue(new Product(name, price, description, image, category));
+        ref.child("items").child(name).setValue(new Product(name, price, description, image, category,brand, quantity, image+name));
     }
 
     //Open up gallery

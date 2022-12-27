@@ -4,26 +4,25 @@ package com.example.shopproject21514586.Product;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.shopproject21514586.R;
 import com.example.shopproject21514586.ui.category.Category;
-import com.example.shopproject21514586.ui.category.CategoryAdapter;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ProductViewHolder> {
+public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHolder> {
 
     private List<Product> products;
 
-    public ProductsAdapter(List<Product> products) {
+
+    public CardViewAdapter(List<Product> products) {
         this.products = products;
     }
 
@@ -37,17 +36,26 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         this.onItemClickListener = listener;
     }
 
+
     @Override
-    public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_product, parent, false);
-        return new ProductViewHolder(view);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
+        return new ViewHolder(view);
     }
 
-    @Override
-    public void onBindViewHolder(ProductViewHolder holder, int position) {
-        Product product = products.get(position);
-        holder.bind(product);
 
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // Set the name and image for the category
+        Product product = products.get(position);
+        //To de bug
+        holder.productName.setText(product.getName());
+        holder.productPrice.setText(product.getPrice());
+        holder.productDescription.setText(product.getDescription());
+        Glide.with(holder.productImage.getContext()).load(product.getImageUrl()).into(holder.productImage);
+
+
+        // Set the click listener for the category
         holder.itemView.setOnClickListener(v -> {
             if (onItemClickListener != null) {
                 onItemClickListener.onItemClick(product);
@@ -60,34 +68,31 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         return products.size();
     }
 
-    public class ProductViewHolder extends RecyclerView.ViewHolder {
-        ImageView productImage;
+    class ViewHolder extends RecyclerView.ViewHolder {
         TextView productName;
-        TextView productDescription;
         TextView productPrice;
-        Button addToCartButton;
+        TextView productDescription;
+        ImageView productImage;
 
-        public ProductViewHolder(View itemView) {
+
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            productImage = itemView.findViewById(R.id.item_image);
             productName = itemView.findViewById(R.id.item_name);
-            productDescription = itemView.findViewById(R.id.item_description);
             productPrice = itemView.findViewById(R.id.item_price);
-            addToCartButton = itemView.findViewById(R.id.BtnBasket);
+            productDescription = itemView.findViewById(R.id.item_description);
+            productImage = itemView.findViewById(R.id.item_image);
+
+            // Set an onClickListener on the root view of the ViewHolder
         }
 
         public void bind(Product product) {
             // Bind the data to the views in the ViewHolder
+
             productName.setText(product.getName());
+            productPrice.setText(product.getPrice());
             productDescription.setText(product.getDescription());
-            productPrice.setText("Price: " + product.getPrice());
-//            productPrice.setText((int) product.getPrice());
-            // Load the product image using Glide or any other image loading library
-            Glide.with(itemView.getContext())
-                    .load(product.getImageUrl())
-                    .into(productImage);
+            Glide.with(productImage.getContext()).load(product.getImageUrl()).into(productImage);
         }
     }
-
 }
 

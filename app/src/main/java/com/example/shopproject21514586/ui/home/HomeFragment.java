@@ -9,6 +9,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.shopproject21514586.Product.CardViewAdapter;
 import com.example.shopproject21514586.Product.Product;
 import com.example.shopproject21514586.Product.ProductsAdapter;
 import com.example.shopproject21514586.R;
@@ -32,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -53,38 +56,46 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/");
         mDatabase = database.getReference("Products");
+
+
         productsRecycler = view.findViewById(R.id.product_recycler);
         productsRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-
-        // Set up the query to search for products with a name that contains the search text
 
         // Set up the query to search for products with a name that contains the search text
         SearchView searchView = view.findViewById(R.id.productSearch);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                return false;
-            }
-            @Override
-            public boolean onQueryTextChange(String newText) {
+            public boolean onQueryTextSubmit(String newText) {
                 Query query = mDatabase.child("items").orderByChild("name").startAt(newText).endAt(newText + "\uf8ff");
                 query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Log.d("TAG", "CHANGE: " + dataSnapshot.getKey());
                         productList.clear();
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            Log.d("TAG", "onDataChange: " + snapshot.getKey());
                             Product product = snapshot.getValue(Product.class);
 
-                            if (product.getName().contains(newText)) {
+                            if (product.getName().contains(newText)
+                                    ||product.getCategory().contains(newText)
+                                        ||product.getBrand().contains(newText)) {
                                 productList.add(product);
                             }
 
                         }
                         // Pass the data to the CpusAdapter and set the adapter for the RecyclerView
-                        ProductsAdapter adapter = new ProductsAdapter(productList);
+                        CardViewAdapter adapter = new CardViewAdapter(productList);
+                        adapter.setOnItemClickListener(new CardViewAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(Product product) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("product", product.getName());
+                                bundle.putString("price", product.getPrice());
+                                bundle.putString("brand", product.getBrand());
+                                bundle.putString("category", product.getCategory());
+                                bundle.putString("description", product.getDescription());
+                                bundle.putString("image", product.getImageUrl());
+                                Navigation.findNavController(view).navigate(R.id.action_navigate_to_product, bundle);
+                            }
+                        });
                         productsRecycler.setAdapter(adapter);
                     }
 
@@ -95,31 +106,12 @@ public class HomeFragment extends Fragment {
                 });
                 return false;
             }
-        });
+            @Override
+            public boolean onQueryTextChange(String newText) {
 
-//TODO:
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-//        productsRecycler.setLayoutManager(layoutManager);
-//        Query query = mDatabase.child("CPU");
-//        query.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                // Clear the list of products
-//                // Iterate through the search results and add them to the list
-//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    Product product = snapshot.getValue(Product.class);
-//                    productList.add(product);
-//                }
-//                // Update the UI to display the search results
-//                ProductsAdapter adapter = new ProductsAdapter(productList);
-//                productsRecycler.setAdapter(adapter);
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                // An error occurred, log the error message
-//                Log.e("HomeFragment", databaseError.getMessage());
-//            }
-//        });
+                return false;
+            }
+        });
 
         // Get a reference to the recycler view
         RecyclerView recyclerView = view.findViewById(R.id.category_recycler);

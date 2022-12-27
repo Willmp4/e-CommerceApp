@@ -47,6 +47,17 @@
         tools:layout="@layout/fragment_admin" />
 
     <fragment
+        android:id="@+id/nav_product"
+        android:name="com.example.shopproject21514586.Product.ProductFragment"
+        android:label="Product"
+        tools:layout="@layout/fragment_product">
+        <argument
+            android:name="productName"
+            app:argType="string" />
+    </fragment>
+
+
+    <fragment
         android:id="@+id/nav_category"
         android:name="com.example.shopproject21514586.ui.category.CategoryFragment"
         tools:layout="@layout/fragment_category">
@@ -54,10 +65,10 @@
         <argument
             android:name="category"
             app:argType="string" />
-        <argument
-            android:name="categoryName"
-            app:argType="string" />
+
     </fragment>
+
+
 
 
     <action
@@ -67,6 +78,28 @@
             android:name="categoryName"
             app:argType="string"
             app:nullable="false" />
+    </action>
+
+    <action
+        android:id="@+id/action_navigate_to_product"
+        app:destination="@id/nav_product">
+        <argument
+            android:name="productName"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="productPrice"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="productDescription"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="productImage"
+            app:argType="string"
+            app:nullable="false" />
+
     </action>
 
 </navigation>

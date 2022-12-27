@@ -62,7 +62,8 @@ public class  MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_my_account, R.id.nav_login, R.id.nav_logout, R.id.nav_home, R.id.nav_registration, R.id.nav_shopping_basket )
+                R.id.nav_my_account, R.id.nav_login, R.id.nav_logout, R.id.nav_home, R.id.nav_registration,
+                R.id.nav_shopping_basket, R.id.nav_product, R.id.nav_admin)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main_navigation);
@@ -88,9 +89,10 @@ public class  MainActivity extends AppCompatActivity {
         String email = Paper.book().read("email");
         String password = Paper.book().read("password");
         String rememberMe = Paper.book().read("rememberMe");
-        if ("true".equals(rememberMe) && email != null && password != null) {
+        String signedIn = Paper.book().read("signedIn");
+        String admin = Paper.book().read("admin");
+        if ("true".equals(signedIn) && email != null && password != null) {
             mAuth = FirebaseAuth.getInstance();
-
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
@@ -112,11 +114,11 @@ public class  MainActivity extends AppCompatActivity {
                         }
                     });
         }
-        if (!"true".equals(Paper.book().read("rememberMe"))) {
-            Paper.book().destroy();
-            mAuth.signOut();
-            show_email.setText("Not logged in");
+        if("true".equals(admin)){
+            Menu nav_Menu = binding.navView.getMenu();
+            nav_Menu.findItem(R.id.nav_admin).setVisible(true);
         }
+
         DatabaseReference usersRef = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/").getReference("Users");
         if(mAuth.getCurrentUser() != null) {
             usersRef.child(mAuth.getCurrentUser().getUid()).child("firstName").addValueEventListener(new ValueEventListener() {
