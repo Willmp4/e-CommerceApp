@@ -1,18 +1,19 @@
 package com.example.shopproject21514586.Product;
 public class Product {
     private String name;
-    private String price;
+    private int price;
     private String description;
     private String imageUrl;
     private String category;
     private String brand;
     private String id;
-    private String quantity;
+    private int quantity;
+    int count = 0;
     public Product() {
         // Default constructor required for calls to DataSnapshot.getValue(Product.class)
     }
 
-    public Product(String name, String price, String description, String imageUrl, String category, String brand, String quantity, String id) {
+    public Product(String name, int price, String description, String imageUrl, String category, String brand, int quantity, String id) {
         this.name = name;
         this.price = price;
         this.description = description;
@@ -21,6 +22,16 @@ public class Product {
         this.brand = brand;
         this.quantity = quantity;
         this.id = id;
+    }
+
+    //Getters and setters
+    //get count
+    public int getCount() {
+        return count;
+    }
+    //set count
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public String getName() {
@@ -36,7 +47,7 @@ public class Product {
         this.category = category;
     }
 
-    public String getPrice() {
+    public int getPrice() {
         return price;
     }
 
@@ -52,7 +63,7 @@ public class Product {
         return brand;
     }
 
-    public String getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
@@ -68,7 +79,7 @@ public class Product {
         this.name = name;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
@@ -84,7 +95,7 @@ public class Product {
         this.brand = brand;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 }

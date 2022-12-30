@@ -1,11 +1,14 @@
 package com.example.shopproject21514586.Product;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -28,6 +31,8 @@ import com.bumptech.glide.Glide;
 import com.example.shopproject21514586.Product.Product;
 import com.example.shopproject21514586.Product.ProductsAdapter;
 import com.example.shopproject21514586.R;
+import com.example.shopproject21514586.UserActivities.MainActivity;
+import com.example.shopproject21514586.basket.Basket;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,25 +51,37 @@ public class ProductFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_product, container, false);
-        TextView productName = root.findViewById(R.id.item_name);
+
+
+        //Change the title of the action bar
         TextView productPrice = root.findViewById(R.id.item_price);
         TextView productDescription = root.findViewById(R.id.item_description);
         ImageView productImage = root.findViewById(R.id.item_image);
         addToBasketButton = root.findViewById(R.id.BtnBasket);
 
+
+        Basket basket = Basket.getInstance();
+
         String name = getArguments().getString("name");
-        Toast.makeText(getContext(), name, Toast.LENGTH_SHORT).show();
-        String price = getArguments().getString("price");
+
+
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(name);
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        //Get the product from the arguments
+        int price = getArguments().getInt("price");
         String description = getArguments().getString("description");
         String image = getArguments().getString("image");
+        String id = getArguments().getString("id");
+        String category = getArguments().getString("category");
+        int quantity = getArguments().getInt("quantity");
+        String brand = getArguments().getString("brand");
+        productPrice.setText("£" + String.valueOf(price));
 
-        productName.setText(name);
-        productPrice.setText(price);
+
         productDescription.setText(description);
         Glide.with(productImage.getContext()).load(image).into(productImage);
-
-
-        // Set a GridLayoutManager for the RecyclerView
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/");
         DatabaseReference ref = database.getReference("Products");
@@ -72,22 +89,32 @@ public class ProductFragment extends Fragment {
         addToBasketButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Add product to basket
+                Product product = new Product(name, price, description, image, category, brand, quantity, id);
+                //Check if the product is already in the basket
+                if (basket.contains(product)) {
+                    Toast.makeText(getContext(), "Product already in basket", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Product added to basket", Toast.LENGTH_SHORT).show();
+                    product.setCount(1);
+                    basket.addProduct(product);
 
-                //go to basket
-                NavController navController = Navigation.findNavController(getActivity(),
-                        R.id.nav_host_fragment_content_main_navigation);
-                navController.navigate(R.id.nav_shopping_basket);
-
+                }
             }
         });
 
         return root;
 
     }
-
-    public void updateUi(String title, View root) {
-        TextView header = root.findViewById(R.id.categoryTitle);
-        header.setText(title);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            // Handle the back button press
+            getActivity().onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
 
 }

@@ -20,5 +20,7 @@
     </style>
 
     <style name="Theme.ShopProject21514586.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.ShopProject21514586.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 
 </resources>

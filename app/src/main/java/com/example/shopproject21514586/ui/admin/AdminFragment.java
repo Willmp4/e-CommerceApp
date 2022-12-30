@@ -124,9 +124,6 @@ public class AdminFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 newCategory(newCategory.getText().toString(), ref);
-                //Start new activity
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
             }
         });
 
@@ -135,7 +132,6 @@ public class AdminFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 openGallery();
-
             }
         });
 
@@ -146,7 +142,15 @@ public class AdminFragment extends Fragment {
             public void onClick(View v) {
                 //Add the product to the database with url to the image
                 //Download url
-                addNewProduct(ref, name.getText().toString(), description.getText().toString(), price.getText().toString(), IMGURL, category.getSelectedItem().toString(), brand.getText().toString(), quantity.getText().toString());
+                CharSequence text = price.getText();
+                String str = text.toString();
+                int value = Integer.parseInt(str);
+
+                CharSequence text1 = quantity.getText();
+                String str1 = text1.toString();
+                int value1 = Integer.parseInt(str1);
+                addNewProduct(ref, name.getText().toString(),
+                        description.getText().toString(), value, IMGURL, category.getSelectedItem().toString(), brand.getText().toString(), value1);
                 //Start main activity
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 startActivity(intent);
@@ -194,7 +198,7 @@ public class AdminFragment extends Fragment {
     }
 
     //Add new product to the database
-    public void addNewProduct(DatabaseReference ref, String name, String description, String price, String image, String category, String brand, String quantity) {
+    public void addNewProduct(DatabaseReference ref, String name, String description, int price, String image, String category, String brand, int quantity) {
         //Push a new product to the database
         ref.child("items").child(name).setValue(new Product(name, price, description, image, category,brand, quantity, image+name));
     }

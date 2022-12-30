@@ -9,39 +9,34 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/product_recycler"
-        android:layout_width="413dp"
-        android:layout_height="579dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.331"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.984" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/category_recycler"
-        android:layout_width="411dp"
-        android:layout_height="98dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/common_google_signin_btn_text_light_normal_background"
-        android:backgroundTintMode="@integer/material_motion_duration_long_1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.076" />
-
-    <SearchView
-        android:id="@+id/productSearch"
-        android:layout_width="298dp"
-        android:layout_height="45dp"
+        android:layout_width="match_parent"
+        android:layout_height="709dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="109dp"
+        android:layout_height="45dp"
+        app:layout_constraintBottom_toTopOf="@+id/product_recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/goToSearch"
+        android:layout_width="117dp"
+        android:layout_height="43dp"
+        android:layout_marginBottom="6dp"
+        android:text="search"
+        app:layout_constraintBottom_toTopOf="@+id/product_recycler"
+        app:layout_constraintEnd_toStartOf="@+id/spinner" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

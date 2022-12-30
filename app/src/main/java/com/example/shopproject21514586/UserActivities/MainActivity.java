@@ -18,8 +18,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.shopproject21514586.R;
+import com.example.shopproject21514586.basket.Basket;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
@@ -43,19 +45,20 @@ public class  MainActivity extends AppCompatActivity {
     private TextView show_email;
     TextView userName;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(this);
+        //Basket
+        Basket basket = new Basket();
 
 
-
+        //Button
         binding = ActivityMainNavigationBinding.inflate(getLayoutInflater());
         //Link to database
         Paper.init(this);
+
         setContentView(binding.getRoot());
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -63,35 +66,31 @@ public class  MainActivity extends AppCompatActivity {
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_my_account, R.id.nav_login, R.id.nav_logout, R.id.nav_home, R.id.nav_registration,
-                R.id.nav_shopping_basket, R.id.nav_product, R.id.nav_admin)
+                R.id.nav_shopping_basket, R.id.nav_product, R.id.nav_admin, R.id.nav_search, R.id.nav_checkout, R.id.nav_payment, R.id.nav_confirmation)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main_navigation);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         View headerView = navigationView.getHeaderView(0);
-
         userName = headerView.findViewById(R.id.userName);
-
         mAuth = FirebaseAuth.getInstance();
         show_email = headerView.findViewById(R.id.show_email);
-
-
-
         }
 
 
     //Check if user is logged in
     public void onStart() {
         super.onStart();
-
         //TODO: Check if user is logged in
+//        mAuth.signOut();
         String email = Paper.book().read("email");
         String password = Paper.book().read("password");
         String rememberMe = Paper.book().read("rememberMe");
         String signedIn = Paper.book().read("signedIn");
         String admin = Paper.book().read("admin");
-        if ("true".equals(signedIn) && email != null && password != null) {
+        if(rememberMe != null && rememberMe.equals("true") && signedIn != null && signedIn.equals("true")){
+            Log.d("TAG", "onStart: " + email + " " + password);
             mAuth = FirebaseAuth.getInstance();
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -105,7 +104,7 @@ public class  MainActivity extends AppCompatActivity {
                                 Menu nav_Menu = binding.navView.getMenu();
                                 nav_Menu.findItem(R.id.nav_login).setVisible(false);
                                 nav_Menu.findItem(R.id.nav_registration).setVisible(false);
-
+                                nav_Menu.findItem(R.id.nav_logout).setVisible(true);
                             } else {
                                 // Login failed
                                 Toast.makeText(MainActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
@@ -113,51 +112,50 @@ public class  MainActivity extends AppCompatActivity {
                             }
                         }
                     });
-        }
-        if("true".equals(admin)){
+            if(admin != null && admin.equals("true")){
+                Menu nav_Menu = binding.navView.getMenu();
+                nav_Menu.findItem(R.id.nav_login).setVisible(false);
+                nav_Menu.findItem(R.id.nav_registration).setVisible(false);
+                nav_Menu.findItem(R.id.nav_logout).setVisible(true);
+                nav_Menu.findItem(R.id.nav_admin).setVisible(true);
+            }
+        } else if (signedIn != null && signedIn.equals("true") && rememberMe.equals("false")) {// User is signed in
+            // Update the Navigation View header with the user's email
+            show_email.setText(mAuth.getCurrentUser().getEmail());
+
+            //Make log in and register invisible
             Menu nav_Menu = binding.navView.getMenu();
-            nav_Menu.findItem(R.id.nav_admin).setVisible(true);
+            nav_Menu.findItem(R.id.nav_login).setVisible(false);
+            nav_Menu.findItem(R.id.nav_registration).setVisible(false);
+            nav_Menu.findItem(R.id.nav_logout).setVisible(true);
+        } else {
+            Menu nav_Menu = binding.navView.getMenu();
+            nav_Menu.findItem(R.id.nav_logout).setVisible(false);
         }
-
-        DatabaseReference usersRef = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/").getReference("Users");
-        if(mAuth.getCurrentUser() != null) {
-            usersRef.child(mAuth.getCurrentUser().getUid()).child("firstName").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Log.d("TAG", "onDataChange: " + dataSnapshot.getValue());
-                    String firstName = dataSnapshot.getValue(String.class);
-                    userName.setText(firstName);
-                    show_email.setText(mAuth.getCurrentUser().getEmail());
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Handle error
-                }
-            });
-        }else {
-            userName.setText("Guest");
-        }
-
-
-    }
-
-    //onDestroy
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        binding = null;
-
-
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_main_drawer, menu);
-        return true;
-    }
+
+//    //onDestroy
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        binding = null;
+//        //sign out if remember me is not checked
+//        String rememberMe = Paper.book().read("rememberMe");
+//        if(rememberMe != null && rememberMe.equals("false")){
+//            mAuth.signOut();
+//            Paper.book().destroy();
+//        }
+//    }
+
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.main, menu);
+//        return true;
+//    }
 
     @Override
     public boolean onSupportNavigateUp() {

@@ -13,16 +13,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.example.shopproject21514586.Product.Product;
 import com.example.shopproject21514586.R;
 import com.example.shopproject21514586.UserActivities.MainActivity;
-import com.example.shopproject21514586.databinding.FragmentLoginBinding;
 
-import com.example.shopproject21514586.ui.login.LogInFragment;
-import com.example.shopproject21514586.users.Users;
+import com.example.shopproject21514586.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -48,7 +43,7 @@ public class RegistrationFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         View view =  inflater.inflate(fragment_registration, container, false);
-        email_ = view.findViewById(R.id.email_input);
+        email_ = view.findViewById(R.id.address);
         password_ = view.findViewById(R.id.password);
         FirstName = view.findViewById(R.id.firstName);
         LastName = view.findViewById(R.id.lastName);

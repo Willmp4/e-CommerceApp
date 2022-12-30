@@ -8,14 +8,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.shopproject21514586.R;
-import com.example.shopproject21514586.ui.category.Category;
-import com.example.shopproject21514586.ui.category.CategoryAdapter;
 
 import java.util.List;
 

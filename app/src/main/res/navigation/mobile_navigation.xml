@@ -13,6 +13,11 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/nav_search"
+        android:name="com.example.shopproject21514586.ui.search.SearchFragment"
+        android:label="Search"
+        tools:layout="@layout/fragment_search" />
+    <fragment
         android:id="@+id/nav_my_account"
         android:name="com.example.shopproject21514586.ui.myaccount.MyAccountFragment"
         android:label="My Account"
@@ -39,6 +44,24 @@
         android:name="com.example.shopproject21514586.ui.shopping_basket.ShoppingBasketFragment"
         android:label="Shopping Basket"
         tools:layout="@layout/fragment_shopping_basket" />
+    <fragment
+        android:id="@+id/nav_checkout"
+        android:name="com.example.shopproject21514586.ui.checkout.CheckOutFragment"
+        android:label="Check Out"
+        tools:layout="@layout/fragment_checkout" />
+
+    <fragment
+        android:id="@+id/nav_confirmation"
+        android:name="com.example.shopproject21514586.ui.checkout.ConfirmCheckOutFragment"
+        android:label="Confirm"
+        tools:layout="@layout/fragment_confirm_checkout" />
+
+    <fragment
+        android:id="@+id/nav_payment"
+        android:name="com.example.shopproject21514586.ui.checkout.PaymentFragment"
+        android:label="Payment Details"
+        tools:layout="@layout/fragment_payment" />
+
 
     <fragment
         android:id="@+id/nav_admin"
@@ -57,28 +80,13 @@
     </fragment>
 
 
-    <fragment
-        android:id="@+id/nav_category"
-        android:name="com.example.shopproject21514586.ui.category.CategoryFragment"
-        tools:layout="@layout/fragment_category">
-
-        <argument
-            android:name="category"
-            app:argType="string" />
-
-    </fragment>
-
 
 
 
     <action
-        android:id="@+id/action_navigate_to_category"
-        app:destination="@id/nav_category">
-        <argument
-            android:name="categoryName"
-            app:argType="string"
-            app:nullable="false" />
-    </action>
+        android:id="@+id/action_navigate_to_search"
+        app:destination="@id/nav_search" />
+
 
     <action
         android:id="@+id/action_navigate_to_product"
