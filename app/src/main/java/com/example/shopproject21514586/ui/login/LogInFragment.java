@@ -221,10 +221,10 @@ public class LogInFragment extends Fragment{
                                         if (snapshot.child(mAuth.getCurrentUser().getUid()).exists()) {
                                             Paper.book().write("admin", "true");
 
-                                            //Go to admin fragment
-                                            NavController navController = Navigation.findNavController(getActivity(),
-                                                    R.id.nav_host_fragment_content_main_navigation);
-                                            navController.navigate(R.id.nav_admin);
+                                            //Intent
+                                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                                            startActivity(intent);
+
                                         } else {
                                             Toast.makeText(getActivity(), "You are not an admin", Toast.LENGTH_SHORT).show();
                                         }

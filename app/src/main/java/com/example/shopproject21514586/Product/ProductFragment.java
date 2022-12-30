@@ -70,7 +70,7 @@ public class ProductFragment extends Fragment {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         //Get the product from the arguments
-        int price = getArguments().getInt("price");
+        double price = getArguments().getInt("price");
         String description = getArguments().getString("description");
         String image = getArguments().getString("image");
         String id = getArguments().getString("id");
@@ -98,7 +98,6 @@ public class ProductFragment extends Fragment {
                     Toast.makeText(getContext(), "Product added to basket", Toast.LENGTH_SHORT).show();
                     product.setCount(1);
                     basket.addProduct(product);
-
                 }
             }
         });

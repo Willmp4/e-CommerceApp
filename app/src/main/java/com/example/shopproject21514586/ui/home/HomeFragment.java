@@ -92,7 +92,7 @@ public class HomeFragment extends Fragment {
                                     public void onItemClick(Product product) {
                                         Bundle bundle = new Bundle();
                                         bundle.putString("name", product.getName());
-                                        bundle.putInt("price", product.getPrice());
+                                        bundle.putDouble("price", product.getPrice());
                                         bundle.putString("description", product.getDescription());
                                         bundle.putString("image", product.getImageUrl());
                                         bundle.putString("category", product.getCategory());

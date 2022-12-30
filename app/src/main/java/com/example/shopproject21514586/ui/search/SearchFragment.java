@@ -81,7 +81,7 @@ public class SearchFragment extends Fragment {
                             public void onItemClick(Product product) {
                                 Bundle bundle = new Bundle();
                                 bundle.putString("product", product.getName());
-                                bundle.putInt("price", product.getPrice());
+                                bundle.putDouble("price", product.getPrice());
                                 bundle.putString("brand", product.getBrand());
                                 bundle.putString("category", product.getCategory());
                                 bundle.putString("description", product.getDescription());

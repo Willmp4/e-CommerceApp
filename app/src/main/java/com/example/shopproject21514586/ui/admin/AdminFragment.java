@@ -144,7 +144,7 @@ public class AdminFragment extends Fragment {
                 //Download url
                 CharSequence text = price.getText();
                 String str = text.toString();
-                int value = Integer.parseInt(str);
+                Double value = Double.parseDouble(str);
 
                 CharSequence text1 = quantity.getText();
                 String str1 = text1.toString();
@@ -198,7 +198,7 @@ public class AdminFragment extends Fragment {
     }
 
     //Add new product to the database
-    public void addNewProduct(DatabaseReference ref, String name, String description, int price, String image, String category, String brand, int quantity) {
+    public void addNewProduct(DatabaseReference ref, String name, String description, double price, String image, String category, String brand, int quantity) {
         //Push a new product to the database
         ref.child("items").child(name).setValue(new Product(name, price, description, image, category,brand, quantity, image+name));
     }

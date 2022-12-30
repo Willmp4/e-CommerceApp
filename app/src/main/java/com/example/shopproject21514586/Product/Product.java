@@ -1,7 +1,7 @@
 package com.example.shopproject21514586.Product;
 public class Product {
     private String name;
-    private int price;
+    private double price;
     private String description;
     private String imageUrl;
     private String category;
@@ -13,7 +13,7 @@ public class Product {
         // Default constructor required for calls to DataSnapshot.getValue(Product.class)
     }
 
-    public Product(String name, int price, String description, String imageUrl, String category, String brand, int quantity, String id) {
+    public Product(String name, double price, String description, String imageUrl, String category, String brand, int quantity, String id) {
         this.name = name;
         this.price = price;
         this.description = description;
@@ -47,7 +47,7 @@ public class Product {
         this.category = category;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -79,7 +79,7 @@ public class Product {
         this.name = name;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

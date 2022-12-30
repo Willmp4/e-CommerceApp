@@ -27,6 +27,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.example.shopproject21514586.databinding.ActivityMainNavigationBinding;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,6 +45,7 @@ public class  MainActivity extends AppCompatActivity {
     ActionBarDrawerToggle actionBarDrawerToggle;
     private TextView show_email;
     TextView userName;
+    DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,8 @@ public class  MainActivity extends AppCompatActivity {
 
         //Button
         binding = ActivityMainNavigationBinding.inflate(getLayoutInflater());
+        reference = FirebaseDatabase.getInstance("https://shopapp-d8c31-default-rtdb.europe-west1.firebasedatabase.app/").getReference("Users");
+
         //Link to database
         Paper.init(this);
 
@@ -78,8 +82,8 @@ public class  MainActivity extends AppCompatActivity {
         show_email = headerView.findViewById(R.id.show_email);
         }
 
-
-    //Check if user is logged in
+        //Check if user is logged in
+    @Override
     public void onStart() {
         super.onStart();
         //TODO: Check if user is logged in
@@ -89,7 +93,7 @@ public class  MainActivity extends AppCompatActivity {
         String rememberMe = Paper.book().read("rememberMe");
         String signedIn = Paper.book().read("signedIn");
         String admin = Paper.book().read("admin");
-        if(rememberMe != null && rememberMe.equals("true") && signedIn != null && signedIn.equals("true")){
+        if(rememberMe != null && rememberMe.equals("true") && signedIn != null && signedIn.equals("true")) {
             Log.d("TAG", "onStart: " + email + " " + password);
             mAuth = FirebaseAuth.getInstance();
             mAuth.signInWithEmailAndPassword(email, password)
@@ -97,14 +101,33 @@ public class  MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                // Login successful
-                                // Update the Navigation View header with the user's email
-                                show_email.setText(mAuth.getCurrentUser().getEmail());
-                                //Make log in and register invisible
-                                Menu nav_Menu = binding.navView.getMenu();
-                                nav_Menu.findItem(R.id.nav_login).setVisible(false);
-                                nav_Menu.findItem(R.id.nav_registration).setVisible(false);
-                                nav_Menu.findItem(R.id.nav_logout).setVisible(true);
+                                // Sign in success, update UI with the signed-in user's information
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                DatabaseReference ref = reference.child(user.getUid());
+                                ref.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        String firstName = snapshot.child("firstName").getValue(String.class);
+                                        String lastName = snapshot.child("lastName").getValue(String.class);
+                                        String name = firstName + " " + lastName;
+                                        show_email.setText(user.getEmail());
+                                        userName.setText(name);
+
+                                        // Login successful
+                                        // Update the Navigation View header with the user's email
+                                        show_email.setText(mAuth.getCurrentUser().getEmail());
+                                        //Make log in and register invisible
+                                        Menu nav_Menu = binding.navView.getMenu();
+                                        nav_Menu.findItem(R.id.nav_login).setVisible(false);
+                                        nav_Menu.findItem(R.id.nav_registration).setVisible(false);
+                                        nav_Menu.findItem(R.id.nav_logout).setVisible(true);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
                             } else {
                                 // Login failed
                                 Toast.makeText(MainActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
@@ -112,7 +135,7 @@ public class  MainActivity extends AppCompatActivity {
                             }
                         }
                     });
-            if(admin != null && admin.equals("true")){
+            if (admin != null && admin.equals("true")) {
                 Menu nav_Menu = binding.navView.getMenu();
                 nav_Menu.findItem(R.id.nav_login).setVisible(false);
                 nav_Menu.findItem(R.id.nav_registration).setVisible(false);
@@ -136,18 +159,27 @@ public class  MainActivity extends AppCompatActivity {
 
 
 
-//    //onDestroy
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        binding = null;
-//        //sign out if remember me is not checked
-//        String rememberMe = Paper.book().read("rememberMe");
-//        if(rememberMe != null && rememberMe.equals("false")){
-//            mAuth.signOut();
-//            Paper.book().destroy();
-//        }
-//    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        String signedIn = Paper.book().read("signedIn");
+        String rememberMe = Paper.book().read("rememberMe");
+        if (signedIn != null && signedIn.equals("true") && rememberMe.equals("false")) {
+            // User is signed in but the "remember me" option is not checked
+            // Sign out the user
+            mAuth.signOut();
+
+            // Update the Navigation View header with a default message
+            show_email.setText("Please sign in");
+
+            // Make log in and register visible, and log out invisible
+            Menu nav_Menu = binding.navView.getMenu();
+            nav_Menu.findItem(R.id.nav_login).setVisible(true);
+            nav_Menu.findItem(R.id.nav_registration).setVisible(true);
+            nav_Menu.findItem(R.id.nav_logout).setVisible(false);
+        }
+    }
+
 
 
 //    @Override

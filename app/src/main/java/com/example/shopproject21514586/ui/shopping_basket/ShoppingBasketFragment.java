@@ -79,8 +79,6 @@ public class ShoppingBasketFragment extends Fragment {
             }
         });
 
-
-
         return view;
     }
 

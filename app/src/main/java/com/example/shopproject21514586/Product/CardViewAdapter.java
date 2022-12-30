@@ -74,6 +74,23 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
         holder.productPrice.setText("£" + String.valueOf(product.getPrice()));
         Glide.with(holder.productImage.getContext()).load(product.getImageUrl()).into(holder.productImage);
 
+        // Set the click listener for the add to basket button
+        if (holder.BasketButton != null) {
+            holder.BasketButton.setOnClickListener(v -> {
+                if (onButtonClickListener != null) {
+                    onButtonClickListener.onClick(v);
+                }
+                if (!basket.contains(product)) {
+                    product.setCount(1);
+                    basket.addProduct(product);
+                    Toast.makeText(holder.BasketButton.getContext(), "Added to basket", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(holder.BasketButton.getContext(), "Already in basket", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+
         // Check if the layout contains the add and subtract buttons
         if (holder.addButton != null && holder.subtractButton != null && holder.countTextView != null) {
             // Check if the bundle contains a count for this product, and if so set the product count to the value in the bundle
@@ -132,6 +149,8 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
         });
     }
 
+    //Turn off the add and subtract buttons
+
 
     @Override
     public int getItemCount() {
@@ -145,6 +164,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
         FloatingActionButton addButton;
         FloatingActionButton subtractButton;
         TextView countTextView;
+        Button BasketButton;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -155,6 +175,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
             addButton = itemView.findViewById(R.id.plusButton);
             subtractButton = itemView.findViewById(R.id.minusButton);
             countTextView = itemView.findViewById(R.id.item_quantity);
+            BasketButton = itemView.findViewById(R.id.add_to_cart_button);
 
             // Set an onClickListener on the root view of the ViewHolder
         }
@@ -163,8 +184,14 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
             // Bind the data to the views in the ViewHolder
 
             productName.setText(product.getName());
-            productPrice.setText(product.getPrice());
+            double price = product.getPrice();
+            productPrice.setText("£" + String.valueOf(price));
             Glide.with(productImage.getContext()).load(product.getImageUrl()).into(productImage);
+        }
+
+        public void setEnabled(boolean enabled) {
+            addButton.setEnabled(enabled);
+            subtractButton.setEnabled(enabled);
         }
 
     }
